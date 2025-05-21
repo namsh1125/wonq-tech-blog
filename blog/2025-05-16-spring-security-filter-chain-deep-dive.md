@@ -145,7 +145,7 @@ public final class HttpSecurity extends AbstractConfiguredSecurityBuilder<Defaul
     private HttpSecurity addFilterAtOffsetOf(Filter filter, int offset, Class<? extends Filter> registeredFilter) {
         Integer registeredFilterOrder = this.filterOrders.getOrder(registeredFilter);
         if (registeredFilterOrder == null) {
-        	throw new IllegalArgumentException("The Filter class " + registeredFilter.getName() + " does not have a registered order");
+            throw new IllegalArgumentException("The Filter class " + registeredFilter.getName() + " does not have a registered order");
         }
         int order = registeredFilterOrder + offset;
         this.filters.add(new OrderedFilter(filter, order));
@@ -265,7 +265,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
     private Collection<SecurityConfigurer<O, B>> getConfigurers() {
         List<SecurityConfigurer<O, B>> result = new ArrayList<>();
         for (List<SecurityConfigurer<O, B>> configs : this.configurers.values()) {
-        	result.addAll(configs);
+            result.addAll(configs);
         }
         return result;
     }
@@ -320,7 +320,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
     private Collection<SecurityConfigurer<O, B>> getConfigurers() {
         List<SecurityConfigurer<O, B>> result = new ArrayList<>();
         for (List<SecurityConfigurer<O, B>> configs : this.configurers.values()) {
-        	result.addAll(configs);
+            result.addAll(configs);
         }
         return result;
     }
@@ -363,7 +363,7 @@ public final class HttpSecurity extends AbstractConfiguredSecurityBuilder<Defaul
     	this.filters.sort(OrderComparator.INSTANCE);
     	List<Filter> sortedFilters = new ArrayList<>(this.filters.size());
     	for (Filter filter : this.filters) {
-    		sortedFilters.add(((OrderedFilter) filter).filter);
+    	    sortedFilters.add(((OrderedFilter) filter).filter);
     	}
     	return new DefaultSecurityFilterChain(this.requestMatcher, sortedFilters);
     }
