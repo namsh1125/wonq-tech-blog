@@ -422,3 +422,9 @@ Spring Security의 필터 체인을 설정할 때는 단순히 코드를 작성�
 이번 경험을 통해 Spring Security의 내부 동작 방식을 더 깊이 이해하게 되었고, 이를 바탕으로 더 안전한 결제 시스템을 구축할 수 있게 되었어요. 
 
 여러분도 이 글을 통해 Spring Security의 필터 체인에 대한 이해를 높이고, Security 설정을 더 효과적으로 관리할 수 있기를 바라요.
+
+## 참고 자료
+
+- [FilterOrderRegistration.java](https://github.com/spring-projects/spring-security/blob/main/config/src/main/java/org/springframework/security/config/annotation/web/builders/FilterOrderRegistration.java)
+- [HttpSecurity.java](https://github.com/spring-projects/spring-security/blob/main/config/src/main/java/org/springframework/security/config/annotation/web/builders/HttpSecurity.java)
+- [AbstractConfiguredSecurityBuilder.java](https://github.com/spring-projects/spring-security/blob/main/config/src/main/java/org/springframework/security/config/annotation/AbstractConfiguredSecurityBuilder.java)
