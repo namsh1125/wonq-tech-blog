@@ -167,7 +167,7 @@ public final class HttpSecurity extends AbstractConfiguredSecurityBuilder<Defaul
     - 만약 참조하는 필터가 등록되지 않았다면(순서가 null이면) 예외를 던져요.
     - 참조 필터의 순서에 offset을 더해 새 필터의 순서를 계산해요.
     - 새 필터를 `OrderedFilter`로 감싸서 `filters` 목록에 추가해요.
-    - 새 필터의 클래스와 계산된 순서를 `filterOrders`에 등록해요. 이렇게 하면 나중에 이 필터를 참조할 수 있게 되요!
+    - 새 필터의 클래스와 계산된 순서를 `filterOrders`에 등록해요. 이렇게 하면 나중에 이 필터를 참조할 수 있게 돼요!
 
 ### 3. 커스텀 필터 적용 과정
 
