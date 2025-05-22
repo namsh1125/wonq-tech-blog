@@ -145,7 +145,7 @@ public final class HttpSecurity extends AbstractConfiguredSecurityBuilder<Defaul
     private HttpSecurity addFilterAtOffsetOf(Filter filter, int offset, Class<? extends Filter> registeredFilter) {
         Integer registeredFilterOrder = this.filterOrders.getOrder(registeredFilter);
         if (registeredFilterOrder == null) {
-        	throw new IllegalArgumentException("The Filter class " + registeredFilter.getName() + " does not have a registered order");
+            throw new IllegalArgumentException("The Filter class " + registeredFilter.getName() + " does not have a registered order");
         }
         int order = registeredFilterOrder + offset;
         this.filters.add(new OrderedFilter(filter, order));
@@ -167,7 +167,7 @@ public final class HttpSecurity extends AbstractConfiguredSecurityBuilder<Defaul
     - 만약 참조하는 필터가 등록되지 않았다면(순서가 null이면) 예외를 던져요.
     - 참조 필터의 순서에 offset을 더해 새 필터의 순서를 계산해요.
     - 새 필터를 `OrderedFilter`로 감싸서 `filters` 목록에 추가해요.
-    - 새 필터의 클래스와 계산된 순서를 `filterOrders`에 등록해요. 이렇게 하면 나중에 이 필터를 참조할 수 있게 되요!
+    - 새 필터의 클래스와 계산된 순서를 `filterOrders`에 등록해요. 이렇게 하면 나중에 이 필터를 참조할 수 있게 돼요!
 
 ### 3. 커스텀 필터 적용 과정
 
@@ -265,7 +265,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
     private Collection<SecurityConfigurer<O, B>> getConfigurers() {
         List<SecurityConfigurer<O, B>> result = new ArrayList<>();
         for (List<SecurityConfigurer<O, B>> configs : this.configurers.values()) {
-        	result.addAll(configs);
+            result.addAll(configs);
         }
         return result;
     }
@@ -320,7 +320,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
     private Collection<SecurityConfigurer<O, B>> getConfigurers() {
         List<SecurityConfigurer<O, B>> result = new ArrayList<>();
         for (List<SecurityConfigurer<O, B>> configs : this.configurers.values()) {
-        	result.addAll(configs);
+            result.addAll(configs);
         }
         return result;
     }
@@ -363,7 +363,7 @@ public final class HttpSecurity extends AbstractConfiguredSecurityBuilder<Defaul
     	this.filters.sort(OrderComparator.INSTANCE);
     	List<Filter> sortedFilters = new ArrayList<>(this.filters.size());
     	for (Filter filter : this.filters) {
-    		sortedFilters.add(((OrderedFilter) filter).filter);
+    	    sortedFilters.add(((OrderedFilter) filter).filter);
     	}
     	return new DefaultSecurityFilterChain(this.requestMatcher, sortedFilters);
     }
@@ -422,3 +422,9 @@ Spring Security의 필터 체인을 설정할 때는 단순히 코드를 작성�
 이번 경험을 통해 Spring Security의 내부 동작 방식을 더 깊이 이해하게 되었고, 이를 바탕으로 더 안전한 결제 시스템을 구축할 수 있게 되었어요. 
 
 여러분도 이 글을 통해 Spring Security의 필터 체인에 대한 이해를 높이고, Security 설정을 더 효과적으로 관리할 수 있기를 바라요.
+
+## 참고 자료
+
+- [FilterOrderRegistration.java](https://github.com/spring-projects/spring-security/blob/main/config/src/main/java/org/springframework/security/config/annotation/web/builders/FilterOrderRegistration.java)
+- [HttpSecurity.java](https://github.com/spring-projects/spring-security/blob/main/config/src/main/java/org/springframework/security/config/annotation/web/builders/HttpSecurity.java)
+- [AbstractConfiguredSecurityBuilder.java](https://github.com/spring-projects/spring-security/blob/main/config/src/main/java/org/springframework/security/config/annotation/AbstractConfiguredSecurityBuilder.java)
