@@ -195,20 +195,27 @@ NGINX는 경량화된 고성능 웹 서버로, 리버스 프록시 기능이 특
    아래 명령어를 사용해 인증서 파일들을 GCP 인스턴스로 복사해주세요.
 
    ```bash
-   sudo scp ./certs/{ca.crt,server.crt,server.key} [USERNAME]@[INSTANCE_IP]
+   sudo scp -i ~/.ssh/[YOUR_SSH_KEY] ./certs/{ca.crt,server.crt,server.key} [USERNAME]@[INSTANCE_IP]:/tmp/
    ```
 
    혹은 gcloud 명령어를 사용해도 돼요.
 
    ```bash
-   sudo gcloud compute scp ./certs/{ca.crt,server.crt,server.key} [INSTANCE_NAME]:/mtls-demo/certs/ --zone [ZONE]
+   sudo gcloud compute scp ./certs/{ca.crt,server.crt,server.key} [INSTANCE_NAME]:/tmp/ --zone [ZONE]
    ```
 
 3. 파일이 제대로 전송됐는지 확인해볼까요?
+   
    ```bash
-   ls /mtls-demo/certs
+   ls /tmp
    ```
-   GCP 인스턴스에 정상적으로 전송되었다면 `/mtls-demo/certs` 경로에 `ca.crt`, `server.crt`, `server.key` 파일들이 보일 거예요.
+   GCP 인스턴스에 정상적으로 전송되었다면 `/tmp` 경로에 `ca.crt`, `server.crt`, `server.key` 파일들이 보일 거예요.
+
+4. 이제 인증서 파일들을 `/mtls-demo/certs` 디렉토리로 이동해볼게요.
+
+   ```bash
+   sudo mv /tmp/{ca.crt,server.crt,server.key} /mtls-demo/certs/
+   ```
 
 ### 2.4. 방화벽 설정하기
 
