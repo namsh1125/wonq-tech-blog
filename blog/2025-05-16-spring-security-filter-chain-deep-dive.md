@@ -1,6 +1,6 @@
 ---
 slug: spring-security-filter-chain-deep-dive
-title: Spring Security 필터 체인 등록 문제 해결하기
+title: Spring Security 필터 체인 등록 문제 해결기
 authors: polar
 tags: [spring-security, filter-chain, trouble-shooting, spring-boot, java]
 ---
