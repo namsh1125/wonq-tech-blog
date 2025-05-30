@@ -103,7 +103,7 @@ graph TB
 
 ## 4. 해결 방안: 도메인 기반 접근법으로의 전환
 
-그러나 이러한 방식은 **외부 IP 할당량을 초과**하게 되었고, 이를 해결하기 위해 **단일 Ingress Controller**를 도입하여 도메인 기반으로 접근하는 방식을 선택했어요.
+그러나 이러한 방식은 **외부 IP 할당량을 초과**하게 되었죠.
 
 ```mermaid
 graph TB
@@ -152,6 +152,8 @@ graph TB
     class M1,M2,M3 serviceStyle
 ```
 
+그래서 저희는 이 문제를 **단일 Ingress Controller**를 도입하여 해결하기로 했어요.
+
 ## 5. 마이그레이션 과정
 
 저희 팀은 도메인 기반 접근 방식으로 전환하기 위해 다음과 같은 단계를 거쳤어요.
@@ -159,7 +161,8 @@ graph TB
 ### 5-1. 도메인 구매 및 DNS 설정
 
 먼저 **도메인을 구매하고 DNS 설정**을 완료했어요.
-이 도메인은 가비아(Gabia, Inc.)에서 구매했으며, Google Cloud DNS를 사용하여 관리하고 있어요.
+도메인은 [가비아](https://www.gabia.com/?utm_source=google-gdn&utm_medium=performanceMax&utm_campaign=%EA%B0%80%EB%B9%84%EC%95%84&utm_term=%EA%B0%80%EB%B9%84%EC%95%84)에서 구매했으며, 
+[Google Cloud DNS](https://cloud.google.com/dns?utm_source=google&utm_medium=cpc&utm_campaign=japac-KR-all-en-dr-BKWS-all-lv-trial-PHR-dr-1710102&utm_content=text-ad-none-none-DEV_c-CRE_631194905985-ADGP_Hybrid+%7C+BKWS+-+BRO+%7C+Txt+-Networking-Cloud+DNS-gcp+cloud+DNS-main-KWID_43700076505030106-kwd-1729662906163&userloc_9219195-network_g&utm_term=KW_google+cloud+dns+account&gad_source=1&gad_campaignid=12205783852&gclid=CjwKCAjwruXBBhArEiwACBRtHTXkqfivICKh0UR-DT_08Y7AwKZQFC61Na-8rkvgKjxF_zt4JE9a-hoCrcMQAvD_BwE&gclsrc=aw.ds&hl=ko)를 사용하여 서브도메인과 DNS 레코드를 설정했어요.
 
 ![도메인 구매 및 네임 서버 설정](./img/domain-registration.png)
 
@@ -256,7 +259,7 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 
 ### [6-2. ClusterIssuer 생성](https://github.com/WON-Q/infra/commit/c9f3b545ea3ac7550e0dbe556d33d95a99af17f1)
 
-그 다음으로, **ClusterIssuer 리소스를 생성**했어요.
+그 다음으로, cert-manager가 Let's Encrypt를 통해 인증서를 발급받을 수 있도록 **ClusterIssuer 리소스를 생성**했어요.
 
 ```yaml
 apiVersion: cert-manager.io/v1
@@ -275,11 +278,9 @@ spec:
             class: nginx
 ```
 
-이 설정은 **cert-manager가 Let's Encrypt를 통해 인증서를 발급받을 수 있도록** 해줘요. `email` 필드는 인증서 갱신 알림 등을 받을 이메일 주소로 설정했어요.
-
 ### 6-3. Ingress에 SSL 설정 추가
 
-기존 Ingress에 cert-manager 어노테이션과 TLS 섹션을 추가해서 [모든 서브도메인에 대한 SSL 인증서를 한 번에 발급](https://github.com/WON-Q/infra/commit/0fc92021fc25a00711bc24739b13e78c6752942e)받도록 설정했어요.
+마지막으로, 기존 Ingress에 cert-manager 어노테이션과 TLS 섹션을 추가해서 [모든 서브도메인에 대한 SSL 인증서를 한 번에 발급](https://github.com/WON-Q/infra/commit/0fc92021fc25a00711bc24739b13e78c6752942e)받도록 설정했어요.
 
 ```yaml title="service-ingress.yaml"
 apiVersion: networking.k8s.io/v1
