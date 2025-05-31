@@ -2,7 +2,7 @@
 slug: mysql-max-connection-troubleshooting
 title: MySQL max_connections 초과 문제 해결기
 authors: polar
-tags: [ mysql, hikaricp, connection-pool, database, spring-boot, troubleshooting ]
+tags: [mysql, hikaricp, connection-pool, database, spring-boot, trouble-shooting]
 ---
 
 # MySQL max_connections 초과 문제 해결기: 커넥션 풀 최적화와 인프라 개선

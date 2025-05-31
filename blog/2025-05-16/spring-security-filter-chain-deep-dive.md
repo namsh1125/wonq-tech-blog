@@ -81,7 +81,7 @@ public class SecurityConfig {
 
 왜 이전 코드에서 오류가 발생했을까요?
 
-간단히 말하면, Spring Security는 필터 체인을 구성할 때 참조되는 필터가 이미 체인에 등록되어 있어야 해요. 
+간단히 말하면, Spring Security는 필터 체인을 구성할 때 참조되는 필터가 이미 체인에 등록되어 있어야 해요.
 이전 코드에서는 `PaymentTokenAuthenticationFilter`가 아직 체인에 추가되지 않은 상태에서 참조했기 때문에 오류가 발생했어요.
 
 ## Spring Security 내부 들여다보기: 필터 체인은 어떻게 구성될까?
@@ -163,11 +163,11 @@ public final class HttpSecurity extends AbstractConfiguredSecurityBuilder<Defaul
 
 2. `addFilterAtOffsetOf` 메서드는 다음 작업을 수행해요:
 
-    - `filterOrders.getOrder(registeredFilter)`를 호출해서 참조하는 필터의 순서를 조회해요.
-    - 만약 참조하는 필터가 등록되지 않았다면(순서가 null이면) 예외를 던져요.
-    - 참조 필터의 순서에 offset을 더해 새 필터의 순서를 계산해요.
-    - 새 필터를 `OrderedFilter`로 감싸서 `filters` 목록에 추가해요.
-    - 새 필터의 클래스와 계산된 순서를 `filterOrders`에 등록해요. 이렇게 하면 나중에 이 필터를 참조할 수 있게 돼요!
+   - `filterOrders.getOrder(registeredFilter)`를 호출해서 참조하는 필터의 순서를 조회해요.
+   - 만약 참조하는 필터가 등록되지 않았다면(순서가 null이면) 예외를 던져요.
+   - 참조 필터의 순서에 offset을 더해 새 필터의 순서를 계산해요.
+   - 새 필터를 `OrderedFilter`로 감싸서 `filters` 목록에 추가해요.
+   - 새 필터의 클래스와 계산된 순서를 `filterOrders`에 등록해요. 이렇게 하면 나중에 이 필터를 참조할 수 있게 돼요!
 
 ### 3. 커스텀 필터 적용 과정
 
@@ -272,7 +272,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 }
 ```
 
-이 시점에서 각 `SecurityConfigurer`는 기본 설정을 준비하고, 필요한 객체들을 생성해요. 
+이 시점에서 각 `SecurityConfigurer`는 기본 설정을 준비하고, 필요한 객체들을 생성해요.
 예를 들어, `FormLoginConfigurer`는 로그인 페이지 URL, 인증 성공/실패 핸들러 등을 초기화해요.
 
 #### 2) CONFIGURING (설정) 단계
@@ -327,7 +327,7 @@ public abstract class AbstractConfiguredSecurityBuilder<O, B extends SecurityBui
 }
 ```
 
-이 단계에서 실제 필터 설정이 적용되고, 여러분이 `HttpSecurity`에 추가했던 커스텀 필터들이 구성돼요. 
+이 단계에서 실제 필터 설정이 적용되고, 여러분이 `HttpSecurity`에 추가했던 커스텀 필터들이 구성돼요.
 예를 들어, `WebSecurityConfigurerAdapter`의 `configure(HttpSecurity http)` 메소드나 `SecurityConfig` 클래스의 `securityFilterChain` 메소드에서 정의한 설정들이 이 시점에 적용돼요.
 
 #### 3) BUILDING (빌드) 단계
@@ -419,7 +419,7 @@ The Filter class com.fisa.pg.config.security.filter.PaymentTokenAuthenticationFi
 ## 마무리: 깊은 이해가 보안을 강화해요
 
 Spring Security의 필터 체인을 설정할 때는 단순히 코드를 작성하는 것 이상으로, 내부 메커니즘을 이해하는 것이 중요해요.
-이번 경험을 통해 Spring Security의 내부 동작 방식을 더 깊이 이해하게 되었고, 이를 바탕으로 더 안전한 결제 시스템을 구축할 수 있게 되었어요. 
+이번 경험을 통해 Spring Security의 내부 동작 방식을 더 깊이 이해하게 되었고, 이를 바탕으로 더 안전한 결제 시스템을 구축할 수 있게 되었어요.
 
 여러분도 이 글을 통해 Spring Security의 필터 체인에 대한 이해를 높이고, Security 설정을 더 효과적으로 관리할 수 있기를 바라요.
 

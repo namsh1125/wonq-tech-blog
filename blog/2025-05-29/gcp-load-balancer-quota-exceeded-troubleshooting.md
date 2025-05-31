@@ -2,7 +2,7 @@
 slug: gcp-load-balancer-quota-exceeded-troubleshooting
 title: GCP Load Balancer 생성 실패 오류 해결기
 authors: polar
-tags: [gcp, kubernetes, load-balancer, quota, trouble-shooting, infrastructure]
+tags: [GCP, Kubernetes, load-balancer, quota, trouble-shooting, infrastructure]
 ---
 
 안녕하세요, 원큐 오더 PL 남승현이에요.
@@ -161,7 +161,7 @@ graph TB
 ### 5-1. 도메인 구매 및 DNS 설정
 
 먼저 **도메인을 구매하고 DNS 설정**을 완료했어요.
-도메인은 [가비아](https://www.gabia.com/?utm_source=google-gdn&utm_medium=performanceMax&utm_campaign=%EA%B0%80%EB%B9%84%EC%95%84&utm_term=%EA%B0%80%EB%B9%84%EC%95%84)에서 구매했으며, 
+도메인은 [가비아](https://www.gabia.com/?utm_source=google-gdn&utm_medium=performanceMax&utm_campaign=%EA%B0%80%EB%B9%84%EC%95%84&utm_term=%EA%B0%80%EB%B9%84%EC%95%84)에서 구매했으며,
 [Google Cloud DNS](https://cloud.google.com/dns?utm_source=google&utm_medium=cpc&utm_campaign=japac-KR-all-en-dr-BKWS-all-lv-trial-PHR-dr-1710102&utm_content=text-ad-none-none-DEV_c-CRE_631194905985-ADGP_Hybrid+%7C+BKWS+-+BRO+%7C+Txt+-Networking-Cloud+DNS-gcp+cloud+DNS-main-KWID_43700076505030106-kwd-1729662906163&userloc_9219195-network_g&utm_term=KW_google+cloud+dns+account&gad_source=1&gad_campaignid=12205783852&gclid=CjwKCAjwruXBBhArEiwACBRtHTXkqfivICKh0UR-DT_08Y7AwKZQFC61Na-8rkvgKjxF_zt4JE9a-hoCrcMQAvD_BwE&gclsrc=aw.ds&hl=ko)를 사용하여 서브도메인과 DNS 레코드를 설정했어요.
 
 ![도메인 구매 및 네임 서버 설정](./img/domain-registration.png)
@@ -323,15 +323,15 @@ wonq-store-tls   True    wonq-store-tls   2m
 
 ## 7. 결과 확인
 
-이제 모든 서비스가 도메인 기반으로 접근 가능해졌어요. 
+이제 모든 서비스가 도메인 기반으로 접근 가능해졌어요.
 
-`www.wonq.store`로 접속하면 `wonq-order-user-client` 서비스로 라우팅되고, 
+`www.wonq.store`로 접속하면 `wonq-order-user-client` 서비스로 라우팅되고,
 `merchant.wonq.store`로 접속하면 `wonq-order-merchant-client` 서비스로 라우팅되죠.
 
 ```text
 ❯ curl -I https://www.wonq.store
 
-HTTP/2 200 
+HTTP/2 200
 date: Fri, 30 May 2025 15:43:15 GMT
 content-type: text/html; charset=utf-8
 content-length: 13057
