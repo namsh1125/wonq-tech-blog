@@ -107,22 +107,27 @@ graph TB
 
 ```mermaid
 graph TB
-    subgraph "새로운 방식 (도메인 기반)"
-        A1[Client] --> L1[Service LB]
-        A2[Admin] --> L2[Monitoring LB]
-        L1 --> I1[Service Ingress Controller]
-        L2 --> I2[Monitoring Ingress Controller]
-        I1 --> D1["www․wonq․store"]
-        I1 --> D2["merchant․wonq․store"]
-        I1 --> D3["api․wonq․store"]
-        I1 --> D4["pg-client․wonq․store"]
-        I1 --> D5["pg-server․wonq․store"]
-        I1 --> D6["app-card․wonq․store"]
-        I1 --> D7["card․wonq․store"]
-        I1 --> D8["bank․wonq․store"]
-        I2 --> D9["argocd․wonq․store"]
-        I2 --> D10["linkerd․wonq․store"]
-        I2 --> D11["grafana․wonq․store"]
+    subgraph "새로운 방식"
+        A1[Client] --> L1[LoadBalancer]
+        A2[Admin] --> L1
+        L1 --> I1[NGINX Ingress Controller]
+
+        I1 --> R1[service-ingress]
+        I1 --> R2[monitoring-ingress]
+
+        R1 --> D1["www․wonq․store"]
+        R1 --> D2["merchant․wonq․store"]
+        R1 --> D3["api․wonq․store"]
+        R1 --> D4["pg-client․wonq․store"]
+        R1 --> D5["pg-server․wonq․store"]
+        R1 --> D6["app-card․wonq․store"]
+        R1 --> D7["card․wonq․store"]
+        R1 --> D8["bank․wonq․store"]
+
+        R2 --> D9["argocd․wonq․store"]
+        R2 --> D10["linkerd․wonq․store"]
+        R2 --> D11["grafana․wonq․store"]
+
         D1 --> S1[wonq-order-user-client]
         D2 --> S2[wonq-order-merchant-client]
         D3 --> S3[wonq-order-server]
@@ -136,17 +141,19 @@ graph TB
         D11 --> M3[prometheus-grafana]
     end
 
-    %% 색상 스타일 정의
+%% 색상 스타일 정의
     classDef clientStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
     classDef lbStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
     classDef ingressStyle fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#000
+    classDef resourceStyle fill:#f1f8e9,stroke:#558b2f,stroke-width:2px,color:#000
     classDef domainStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#000
     classDef serviceStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
 
-    %% 클래스 적용
+%% 클래스 적용
     class A1,A2 clientStyle
-    class L1,L2 lbStyle
-    class I1,I2 ingressStyle
+    class L1 lbStyle
+    class I1 ingressStyle
+    class R1,R2 resourceStyle
     class D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11 domainStyle
     class S1,S2,S3,S4,S5,S6,S7,S8 serviceStyle
     class M1,M2,M3 serviceStyle
@@ -158,19 +165,15 @@ graph TB
 
 저희 팀은 도메인 기반 접근 방식으로 전환하기 위해 다음과 같은 단계를 거쳤어요.
 
-### 5-1. 도메인 구매 및 DNS 설정
+### 5-1. 도메인 구매 및 네임 서버 설정
 
-먼저 **도메인을 구매하고 DNS 설정**을 완료했어요.
-도메인은 [가비아](https://www.gabia.com/?utm_source=google-gdn&utm_medium=performanceMax&utm_campaign=%EA%B0%80%EB%B9%84%EC%95%84&utm_term=%EA%B0%80%EB%B9%84%EC%95%84)에서 구매했으며,
-[Google Cloud DNS](https://cloud.google.com/dns?utm_source=google&utm_medium=cpc&utm_campaign=japac-KR-all-en-dr-BKWS-all-lv-trial-PHR-dr-1710102&utm_content=text-ad-none-none-DEV_c-CRE_631194905985-ADGP_Hybrid+%7C+BKWS+-+BRO+%7C+Txt+-Networking-Cloud+DNS-gcp+cloud+DNS-main-KWID_43700076505030106-kwd-1729662906163&userloc_9219195-network_g&utm_term=KW_google+cloud+dns+account&gad_source=1&gad_campaignid=12205783852&gclid=CjwKCAjwruXBBhArEiwACBRtHTXkqfivICKh0UR-DT_08Y7AwKZQFC61Na-8rkvgKjxF_zt4JE9a-hoCrcMQAvD_BwE&gclsrc=aw.ds&hl=ko)를 사용하여 서브도메인과 DNS 레코드를 설정했어요.
+먼저 **도메인을 [가비아](https://www.gabia.com/?utm_source=google-gdn&utm_medium=performanceMax&utm_campaign=%EA%B0%80%EB%B9%84%EC%95%84&utm_term=%EA%B0%80%EB%B9%84%EC%95%84)에서 구매하고 네임 서버 설정**을 완료했어요.
 
 ![도메인 구매 및 네임 서버 설정](./img/domain-registration.png)
 
-![DNS 레코드 설정](./img/dns-records.png)
-
 ### 5-2. Ingress Controller 설치
 
-그 다음으로, 단일 Ingress Controller를 구축하기 위해 **NGINX Ingress Controller를 설치**했어요.
+그 다음으로, **NGINX Ingress Controller를 설치**했어요.
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.2/deploy/static/provider/cloud/deploy.yaml
@@ -243,6 +246,28 @@ spec:
                 port:
                   number: 3000
 ```
+
+### 5-5. 서브 도메인 설정
+
+마지막으로, **각 서비스에 대한 서브 도메인을 설정**했어요.
+
+아래 명령어를 통해 ingress controller의 IP를 확인하고,
+
+```text
+❯ kubectl get svc -n ingress-nginx
+NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)                      AGE
+ingress-nginx-controller             LoadBalancer   34.118.239.0    34.64.162.17   80:31842/TCP,443:30931/TCP   4m6s
+ingress-nginx-controller-admission   ClusterIP      34.118.236.77   <none>         443/TCP                      4m6s
+
+❯ kubectl get ingress -n default
+NAME                 CLASS   HOSTS                                                           ADDRESS        PORTS     AGE
+monitoring-ingress   nginx   argocd.wonq.store,linkerd.wonq.store,grafana.wonq.store         34.64.162.17   80, 443   3m59s
+service-ingress      nginx   www.wonq.store,merchant.wonq.store,api.wonq.store + 5 more...   34.64.162.17   80, 443   3m48s
+```
+
+Cloud DNS 서비스에서 각 서브 도메인을 ingress controller의 IP로 설정했어요.
+
+![서브 도메인 설정](./img/subdomain-setup.png)
 
 ## 6. SSL 인증서 설정 과정
 
@@ -317,8 +342,9 @@ spec:
 ```text
 ❯ kubectl get certificates
 
-NAME             READY   SECRET           AGE
-wonq-store-tls   True    wonq-store-tls   2m
+NAME                        READY   SECRET                      AGE
+wonq-store-monitoring-tls   True    wonq-store-monitoring-tls   2m
+wonq-store-tls              True    wonq-store-tls              2m
 ```
 
 ## 7. 결과 확인
@@ -347,8 +373,87 @@ strict-transport-security: max-age=31536000; includeSubDomains
 
 ## 8. 마무리
 
-이번 포스트에서는 GCP의 외부 IP 할당량 문제를 해결하기 위해 **LoadBalancer에서 Ingress Controller로 전환**한 과정을 살펴봤어요.
+이번 포스트에서는 GCP의 외부 IP 할당량 문제를 해결하기 위해 **LoadBalancer에서 단일 Ingress Controller로 전환**한 과정을 살펴봤어요.
 
-**도메인 기반 라우팅**을 도입하여 **서비스의 독립성을 유지**하면서도 **9개의 LoadBalancer를 줄이며** 더 효율적이고 확장 가능한 아키텍처로 전환할 수 있었어요.
+단일 Ingress Controller로 전환하며 **서비스의 독립성을 유지**하면서도 **11개의 LoadBalancer를 1개로 줄이고, 외부 IP 할당량 문제를 해결**할 수 있었어요.
+
+## 9. 프로덕션 환경에서의 권장 사항
+
+현재 구현은 **비용 절약을 위해 단일 LoadBalancer**를 사용했지만, **프로덕션 환경에서는 듀얼 LoadBalancer 구조**를 권장해요.
+
+```mermaid
+graph TB
+    subgraph "프로덕션 권장 방식"
+        A1[Client] --> L1[Service LoadBalancer]
+        A2[Admin] --> L2[Monitoring LoadBalancer<br/>IP 접근 제한]
+        L1 --> I1[Service Ingress Controller]
+        L2 --> I2[Monitoring Ingress Controller]
+        
+        I1 --> R1[service-ingress]
+        I2 --> R2[monitoring-ingress]
+
+        R1 --> D1["www․wonq․store"]
+        R1 --> D2["merchant․wonq․store"]
+        R1 --> D3["api․wonq․store"]
+        R1 --> D4["pg-client․wonq․store"]
+        R1 --> D5["pg-server․wonq․store"]
+        R1 --> D6["app-card․wonq․store"]
+        R1 --> D7["card․wonq․store"]
+        R1 --> D8["bank․wonq․store"]
+
+        R2 --> D9["argocd․wonq․store"]
+        R2 --> D10["linkerd․wonq․store"]
+        R2 --> D11["grafana․wonq․store"]
+
+        D1 --> S1[wonq-order-user-client]
+        D2 --> S2[wonq-order-merchant-client]
+        D3 --> S3[wonq-order-server]
+        D4 --> S4[pg-client]
+        D5 --> S5[pg-server]
+        D6 --> S6[app-card-server]
+        D7 --> S7[card-server]
+        D8 --> S8[bank-server]
+        D9 --> M1[argocd-server]
+        D10 --> M2[linkerd-viz]
+        D11 --> M3[prometheus-grafana]
+    end
+
+    %% 색상 스타일 정의
+    classDef clientStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    classDef lbStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    classDef securityLbStyle fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
+    classDef ingressStyle fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#000
+    classDef resourceStyle fill:#f1f8e9,stroke:#558b2f,stroke-width:2px,color:#000
+    classDef domainStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#000
+    classDef serviceStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
+
+    %% 클래스 적용
+    class A1,A2 clientStyle
+    class L1 lbStyle
+    class L2 securityLbStyle
+    class I1,I2 ingressStyle
+    class R1,R2 resourceStyle
+    class D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11 domainStyle
+    class S1,S2,S3,S4,S5,S6,S7,S8 serviceStyle
+    class M1,M2,M3 serviceStyle
+```
+
+### 듀얼 LoadBalancer의 장점
+
+1. **보안 격리**: **인가된 IP에서만 접근 가능**하도록 방화벽 규칙 설정 가능
+2. **트래픽 분산**: 사용자 트래픽과 관리 트래픽을 분리하여 **성능 격리** 달성
+3. **장애 격리**: 한쪽 LoadBalancer에 문제가 생겨도 다른 쪽은 정상 동작
+4. **보안 정책 차별화**: 각 LoadBalancer에 서로 다른 보안 정책 적용 가능
+
+### 현재 vs 권장 구조 비교
+
+| 구분        | 현재 구조 (단일 LB)    | 권장 구조 (듀얼 LB)    |
+|-----------|------------------|------------------|
+| **비용**    | 외부 IP 1개         | 외부 IP 2개         |
+| **보안**    | 모든 서비스 동일한 엔드포인트 | 모니터링 도구 접근 제한 가능 |
+| **관리**    | 단순한 구조           | 역할별 분리된 관리       |
+| **장애 대응** | 단일 장애점           | 격리된 장애 대응        |
+
+현재는 **비용 절약**을 위해 단일 LoadBalancer를 사용했지만, **실제 서비스 운영 시에는 듀얼 LoadBalancer 구조를 적용**할 예정이에요.
 
 이 포스트가 비슷한 문제를 겪고 있는 분들에게 도움이 되길 바라며, 추가적인 질문이나 피드백이 있다면 언제든지 문의해 주세요!
