@@ -1,24 +1,109 @@
 trouble-shooting:
-  label: Trouble Shooting
-  permalink: /trouble-shooting
-  description: Trouble Shooting tag description
+  label: Troubleshooting
+  permalink: /troubleshooting
+  description: 시스템 및 애플리케이션 문제 해결 과정과 해결책을 다룹니다.
 
 java:
   label: Java
   permalink: /java
-  description: Java tag description
+  description: Java 프로그래밍 언어와 관련된 내용을 다룹니다.
 
 spring-boot:
   label: Spring Boot
   permalink: /spring-boot
-  description: Spring Boot tag description
+  description: Spring Boot 프레임워크 개발 및 설정에 관한 내용을 다룹니다.
 
 spring-security:
   label: Spring Security
   permalink: /spring-security
-  description: Spring Security tag description
+  description: Spring Security를 활용한 보안 구현과 인증/인가 처리를 다룹니다.
 
 filter-chain:
   label: Filter Chain
   permalink: /filter-chain
-  description: Filter Chain tag description
+  description: Spring Security의 필터 체인 동작 원리와 커스터마이징을 다룹니다.
+
+mysql:
+  label: MySQL
+  permalink: /mysql
+  description: MySQL 데이터베이스 관리, 최적화 및 문제 해결을 다룹니다.
+
+hikaricp:
+  label: HikariCP
+  permalink: /hikaricp
+  description: HikariCP 커넥션 풀 설정과 성능 최적화를 다룹니다.
+
+connection-pool:
+  label: Connection Pool
+  permalink: /connection-pool
+  description: 데이터베이스 커넥션 풀 관리와 최적화 기법을 다룹니다.
+
+database:
+  label: Database
+  permalink: /database
+  description: 데이터베이스 설계, 관리 및 성능 튜닝을 다룹니다.
+
+GCP:
+  label: GCP
+  permalink: /gcp
+  description: Google Cloud Platform 서비스 활용과 클라우드 인프라 구축을 다룹니다.
+
+Kubernetes:
+  label: Kubernetes
+  permalink: /kubernetes
+  description: Kubernetes 컨테이너 오케스트레이션과 클러스터 관리를 다룹니다.
+
+load-balancer:
+  label: Load Balancer
+  permalink: /load-balancer
+  description: 로드 밸런서 구성과 트래픽 분산 전략을 다룹니다.
+
+quota:
+  label: Quota
+  permalink: /quota
+  description: 클라우드 리소스 할당량 관리와 제한 해결 방법을 다룹니다.
+
+infrastructure:
+  label: Infrastructure
+  permalink: /infrastructure
+  description: IT 인프라 설계, 구축 및 운영 관리를 다룹니다.
+
+Linkerd:
+  label: Linkerd
+  permalink: /linkerd
+  description: Linkerd 서비스 메시를 활용한 마이크로서비스 통신 관리를 다룹니다.
+
+DevOps:
+  label: DevOps
+  permalink: /devops
+  description: 개발과 운영을 통합하는 DevOps 문화와 도구들을 다룹니다.
+
+mTLS:
+  label: mTLS
+  permalink: /mtls
+  description: 상호 TLS 인증을 통한 보안 통신 구현을 다룹니다.
+
+Nginx:
+  label: Nginx
+  permalink: /nginx
+  description: Nginx 웹 서버와 리버스 프록시 설정을 다룹니다.
+
+AWS:
+  label: AWS
+  permalink: /aws
+  description: Amazon Web Services 클라우드 플랫폼 활용을 다룹니다.
+
+Terraform:
+  label: Terraform
+  permalink: /terraform
+  description: Terraform을 활용한 Infrastructure as Code 구현을 다룹니다.
+
+EKS:
+  label: EKS
+  permalink: /eks
+  description: Amazon EKS 클러스터 구축과 관리를 다룹니다.
+
+RDS:
+  label: RDS
+  permalink: /rds
+  description: Amazon RDS 관계형 데이터베이스 서비스 활용을 다룹니다.

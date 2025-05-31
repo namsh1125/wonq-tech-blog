@@ -2,7 +2,7 @@
 slug: mtls-api-communication-setup-guide-nginx
 title: Nginx를 사용한 mTLS 설정 가이드
 authors: polar
-tags: [ mTLS, Nginx, GCP ]
+tags: [mTLS, Nginx, GCP]
 ---
 
 안녕하세요, 원큐 오더 PL 남승현입니다.

@@ -2,12 +2,12 @@
 slug: infrastructure-stack-selection
 title: 인프라 기술 스택 선택기
 authors: polar
-tags: [ Kubernetes, Linkerd, DevOps, Infrastructure ]
+tags: [Kubernetes, Linkerd, DevOps, infrastructure]
 ---
 
 안녕하세요, 원큐 오더 PL 남승현입니다.
 
-이전 포스팅에서는 [NGINX를 사용한 mTLS 설정 가이드](../2025-05-20-mtls-api-communication-setup-guide/index.md)에 대해 다루었는데요,
+이전 포스팅에서는 [NGINX를 사용한 mTLS 설정 가이드](../2025-05-20/mtls-api-communication-setup-guide.md)에 대해 다루었는데요,
 오늘은 저희 팀이 보다 효율적이고 안전한 인프라를 구축하기 위해 선택한 **Kubernetes**와 **Linkerd**에 대해 이야기해보려고 해요.
 
 ## 기존 인프라 설계의 문제점
@@ -41,7 +41,7 @@ tags: [ Kubernetes, Linkerd, DevOps, Infrastructure ]
 
 ## 새로운 인프라 설계
 
-42개의 관리 포인트를 줄이기 위해 저희는 **컨테이너 오케스트레이션**과 **서비스 메시 기술**을 도입하기로 했어요. 
+42개의 관리 포인트를 줄이기 위해 저희는 **컨테이너 오케스트레이션**과 **서비스 메시 기술**을 도입하기로 했어요.
 이러한 기술들을 활용하면 구조를 단순화하면서도 보안과 운영 효율성을 높일 수 있을 것 같았거든요.
 
 ![Kubernetes 아키텍처](https://d33wubrfki0l68.cloudfront.net/2475489eaf20163ec0f54ddc1d92aa8d4c87c96b/e7c81/images/docs/components-of-kubernetes.svg)
@@ -65,7 +65,7 @@ _Kubernetes 클러스터 아키텍처 (출처: Kubernetes 공식 문서)_
 ### 2. Amazon ECS (Elastic Container Service)
 
 - **장점**: AWS 서비스들과 잘 연동되고, 설정도 비교적 간단해요.
-- **단점**: Kubernetes만큼 유연하지 않고 AWS에만 묶여있다는 단점이 있어요. 
+- **단점**: Kubernetes만큼 유연하지 않고 AWS에만 묶여있다는 단점이 있어요.
   특히 저희는 GCP 크레딧으로 초기 테스트를 하고 있었는데, ECS는 AWS에서만 사용 가능하니까 테스트 단계부터 비용이 발생할 수 있었죠.
 
 ### 3. Docker Compose
@@ -119,8 +119,8 @@ Kubernetes를 도입하면서 생긴 또다른 장점은 **자원 활용 효율�
 **(클라이언트 인스턴스) 컨테이너별 자원 사용량:**
 
 ```
-CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O         BLOCK I/O   PIDS 
-88d8d4ce44e7   client    0.00%     41.82MiB / 3.821GiB   1.07%     283kB / 2.4MB   0B / 0B     11 
+CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O         BLOCK I/O   PIDS
+88d8d4ce44e7   client    0.00%     41.82MiB / 3.821GiB   1.07%     283kB / 2.4MB   0B / 0B     11
 ```
 
 **(클라이언트 인스턴스) 시스템 전체 자원 사용량:**
@@ -128,16 +128,16 @@ CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O      
 ```
 top - 02:14:45 up 3 days, 36 min,  3 users,  load average: 0.00, 0.00, 0.00
 Tasks: 119 total,   1 running, 118 sleeping,   0 stopped,   0 zombie
-%Cpu(s):  0.0 us,  0.2 sy,  0.0 ni, 99.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st 
-MiB Mem :   3912.7 total,    351.1 free,    883.6 used,   2996.7 buff/cache     
-MiB Swap:      0.0 total,      0.0 free,      0.0 used.   3029.1 avail Mem 
+%Cpu(s):  0.0 us,  0.2 sy,  0.0 ni, 99.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :   3912.7 total,    351.1 free,    883.6 used,   2996.7 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.   3029.1 avail Mem
 ```
 
 **(서버 인스턴스) 컨테이너별 자원 사용량:**
 
 ```
-CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O        PIDS 
-bba148d0c486   server    0.14%     271.9MiB / 3.821GiB   6.95%     1.02MB / 1.09MB   135kB / 64.6MB   39 
+CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O        PIDS
+bba148d0c486   server    0.14%     271.9MiB / 3.821GiB   6.95%     1.02MB / 1.09MB   135kB / 64.6MB   39
 ```
 
 **(서버 인스턴스) 시스템 전체 자원 사용량:**
@@ -147,9 +147,9 @@ top - 02:11:37 up 11 days, 22:42,  5 users,  load average: 0.07, 0.04, 0.01
 Tasks: 127 total,   1 running, 126 sleeping,   0 stopped,   0 zombie
 top - 02:12:59 up 11 days, 22:43,  5 users,  load average: 0.06, 0.04, 0.00
 Tasks: 124 total,   1 running, 123 sleeping,   0 stopped,   0 zombie
-%Cpu(s):  0.2 us,  0.2 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st 
-MiB Mem :   3912.7 total,   1779.3 free,   1492.3 used,   1007.9 buff/cache     
-MiB Swap:      0.0 total,      0.0 free,      0.0 used.   2420.4 avail Mem 
+%Cpu(s):  0.2 us,  0.2 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :   3912.7 total,   1779.3 free,   1492.3 used,   1007.9 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.   2420.4 avail Mem
 ```
 
 현재 저희는 2core 4GB 인스턴스를 총 8대(클라이언트 3대, 서버 5대) 운영 중인데,
@@ -189,7 +189,7 @@ CNCF 졸업 프로젝트 중에서 저희가 검토한 Service Mesh 솔루션은
 
 1. **리소스 효율성**: 저희는 컴퓨팅 자원을 최대한 비즈니스 로직 처리에 할당하고 싶었어요.
 
-   저희가 검토한 [Dominik Táskai의 2025년 벤치마크 자료](https://linkerd.io/2025/04/24/linkerd-vs-ambient-mesh-2025-benchmarks/)에 따르면, 
+   저희가 검토한 [Dominik Táskai의 2025년 벤치마크 자료](https://linkerd.io/2025/04/24/linkerd-vs-ambient-mesh-2025-benchmarks/)에 따르면,
    다양한 RPS(Request Per Second) 조건에서 Linkerd는 Istio (sidecar 방식) 대비 P99 레이턴시(99번째 백분위수 지연 시간)가 현저히 낮게 측정되었어요.
 
    ![Linkerd vs Istio RPS 20 벤치마크](./img/linkerd-vs-istio-benchmark-rps-20.png)
@@ -229,6 +229,7 @@ Kubernetes와 Linkerd Service Mesh를 도입함으로써 저희는 인프라 관
 궁금한 점이 있으시면 언제든지 문의해주세요!
 
 ## 참고 자료
+
 - [Kubernetes 공식 문서](https://kubernetes.io/docs/home/)
 - [ECS 공식 문서](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/what-is-ecs.html)
 - [Docker Compose 공식 문서](https://docs.docker.com/compose/)
