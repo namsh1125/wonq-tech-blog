@@ -56,7 +56,7 @@ wonq-order-user-client       wonq-order-user-client       LoadBalancer   34.118.
 
 ## 3. LoadBalancer 서비스를 사용한 이유
 
-이전 [인프라 기술 스택 선택기](../2025-05-23-infrastructure-stack-selection/index.md) 포스트에서 언급했듯이, 저희는 **실제 환경을 최대한 모방**하고자 했어요.
+이전 [인프라 기술 스택 선택기](../2025-05-23/infrastructure-stack-selection.md) 포스트에서 언급했듯이, 저희는 **실제 환경을 최대한 모방**하고자 했어요.
 그래서 각 서비스를 **독립적인 외부 엔드포인트로 접근**하도록 설계했죠.
 
 ```mermaid

@@ -7,7 +7,7 @@ tags: [ Kubernetes, Linkerd, DevOps, Infrastructure ]
 
 안녕하세요, 원큐 오더 PL 남승현입니다.
 
-이전 포스팅에서는 [NGINX를 사용한 mTLS 설정 가이드](../2025-05-20-mtls-api-communication-setup-guide/index.md)에 대해 다루었는데요,
+이전 포스팅에서는 [NGINX를 사용한 mTLS 설정 가이드](../2025-05-20/mtls-api-communication-setup-guide.md)에 대해 다루었는데요,
 오늘은 저희 팀이 보다 효율적이고 안전한 인프라를 구축하기 위해 선택한 **Kubernetes**와 **Linkerd**에 대해 이야기해보려고 해요.
 
 ## 기존 인프라 설계의 문제점
