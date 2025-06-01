@@ -86,33 +86,18 @@ tags: []
 | 인터넷 게이트웨이 | 1개                                                             |
 | NAT 게이트웨이    | 3개 (각 AZ별)                                                   |
 | 가용 영역         | 3개 AZ 사용 (ap-northeast-2a, ap-northeast-2b, ap-northeast-2c) |
+| 배치 전략         | 각 AZ별 독립 배치로 고가용성 확보                               |
+| 라우팅            | 크로스 AZ 라우팅으로 장애 시 백업 경로 제공                     |
 
 #### 설계 결정 근거
 
 - **단일 VPC**: [이전 포스팅](../2025-05-23/infrastructure-stack-selection.md)에서 언급했듯이, Kubernetes 네임스페이스를 통한 논리적 격리로 충분하다고 판단했어요.
 - **3개 AZ 사용**: [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_fault_isolation_multiaz_region_system.html)에서 권장하는 고가용성 구성이에요. (최소 2개 AZ 이상)
 - **CIDR 설계**: 10.0.0.0/16으로 충분한 확장성을 제공하면서, 서브넷별로 명확한 구분이 가능해요.
+- **NAT Gateway 고가용성 구성**: 각 AZ별로 NAT Gateway를 배치하여 최대한의 고가용성을 확보했어요. 한 AZ의 NAT Gateway에 장애가 발생해도 다른 AZ의 프라이빗 서브넷들이 정상 동작하는 NAT Gateway를 통해 계속 인터넷에 접근할 수 있도록 크로스 AZ 라우팅을 구성했어요.
+- **NAT Gateway 선택 이유**: [AWS 공식 문서](https://docs.aws.amazon.com/ko_kr/vpc/latest/userguide/vpc-nat-comparison.html)에 따르면, NAT Gateway는 최대 100Gbps까지 자동 확장되어 트래픽 급증에도 안정적으로 대응할 수 있고, [Amazon VPC NAT Gateway SLA](https://d1.awsstatic.com/legal/vpc-sla/Amazon%20VPC%20NAT%20Gateway%20SLA_Korean_2022-05-05.pdf)에 따라 99.9% SLA가 보장되어 서비스 중단 위험을 최소화할 수 있어요.
 
-### 2. NAT Gateway 구성
-
-#### 주요 구성
-
-| 구성 요소   | 설정값                                      |
-| ----------- | ------------------------------------------- |
-| NAT Gateway | 3개 (각 AZ의 퍼블릭 서브넷에 배치)          |
-| Elastic IP  | 3개 (각 NAT Gateway당 1개)                  |
-| 대역폭      | 최대 100Gbps (AWS 공식 스펙)                |
-| 배치 전략   | 각 AZ별 독립 배치로 고가용성 확보           |
-| 라우팅      | 크로스 AZ 라우팅으로 장애 시 백업 경로 제공 |
-
-#### 설계 결정 근거
-
-- **NAT Gateway**
-  - **성능 안정성**: [AWS 공식 문서](https://docs.aws.amazon.com/ko_kr/vpc/latest/userguide/vpc-nat-comparison.html)에 따르면, NAT Gateway는 최대 100Gbps까지 자동 확장되어 트래픽 급증에도 안정적으로 대응할 수 있어요. NAT Instance는 인스턴스 타입에 따라 성능이 제한되고, 트래픽 증가 시 수동으로 스케일업해야 해요.
-  - **안정성**: [Amazon VPC NAT Gateway SLA](https://d1.awsstatic.com/legal/vpc-sla/Amazon%20VPC%20NAT%20Gateway%20SLA_Korean_2022-05-05.pdf)에 따라 99.9% SLA가 보장되어 서비스 중단 위험을 최소화할 수 있어요.
-- **3개 NAT Gateway (고가용성 구성)**: 각 AZ별로 NAT Gateway를 배치하여 최대한의 고가용성을 확보했어요. 한 AZ의 NAT Gateway에 장애가 발생해도 다른 AZ의 프라이빗 서브넷들이 정상 동작하는 NAT Gateway를 통해 계속 인터넷에 접근할 수 있도록 크로스 AZ 라우팅을 구성했어요. 비용이 증가하지만, 금융 서비스의 높은 가용성 요구사항을 충족하기 위해 선택했어요.
-
-### 3. EKS 클러스터 구성
+### 2. EKS 클러스터 구성
 
 #### 주요 구성
 
@@ -146,7 +131,7 @@ tags: []
   - **Grafana EBS 볼륨 (20GB)**: 대시보드 설정과 사용자 데이터를 저장하기 위한 영구 스토리지에요. Pod 재시작 시에도 설정이 유지되어요.
   - **gp3 선택 이유**: gp2 대비 20% 더 나은 성능과 비용 효율성을 제공해요. IOPS와 처리량을 독립적으로 조정할 수 있어 모니터링 워크로드에 최적화되어 있어요.
 
-### 4. RDS 구성
+### 3. RDS 구성
 
 #### 주요 구성
 
@@ -224,7 +209,7 @@ AWS는 RDS 고가용성을 위해 다음과 같은 템플릿을 제공하지만,
   - **비용 효율성**: 5.7은 추가 지원 요금($0.025/시간)이 발생하지만, 8.0은 표준 지원으로 추가 비용이 없어요.
 - **암호화**: 금융 데이터 보호를 위해 저장 시 암호화를 활성화했어요.
 
-### 5. S3 구성
+### 4. S3 구성
 
 #### 주요 구성
 
@@ -240,7 +225,7 @@ AWS는 RDS 고가용성을 위해 다음과 같은 템플릿을 제공하지만,
 - **암호화**: 모든 데이터를 암호화해서 저장해요.
 - **퍼블릭 액세스 허용**: 원큐 오더 서비스에서 매장 이미지 사진이나, 메뉴 이미지 접근을 위해 퍼블릭 엑세스를 허용했어요.
 
-### 6. IAM 구성 (최소 권한 원칙)
+### 5. IAM 구성 (최소 권한 원칙)
 
 **주요 정책 구성**
 
@@ -336,7 +321,7 @@ AWS는 RDS 고가용성을 위해 다음과 같은 템플릿을 제공하지만,
 - **리소스 제한**: S3는 특정 버킷만, Route53은 특정 액션만 허용해요.
 - **모니터링 권한**: Prometheus와 Grafana가 AWS 리소스 메트릭을 수집할 수 있도록 읽기 전용 권한을 부여해요.
 
-### 7. ALB (Application Load Balancer) 구성
+### 6. ALB (Application Load Balancer) 구성
 
 **주요 구성:**
 
@@ -354,7 +339,7 @@ AWS는 RDS 고가용성을 위해 다음과 같은 템플릿을 제공하지만,
 - **인터넷 연결형**: 외부 사용자가 접근할 수 있도록 퍼블릭 서브넷에 배치해요.
 - **타겟 그룹**: Kubernetes Service와 연동하여 자동으로 타겟 관리해요.
 
-### 8. Route53 구성
+### 7. Route53 구성
 
 **주요 구성:**
 
@@ -365,30 +350,7 @@ AWS는 RDS 고가용성을 위해 다음과 같은 템플릿을 제공하지만,
 | A 레코드        | ALB와 연결                                                            |
 | 헬스 체크       | ALB 상태 모니터링                                                     |
 
-**설계 결정 근거:**
-
-- **서브도메인 분리**: 각 서비스별로 명확한 도메인 구분으로 관리 용이성 확보해요.
-- **ALB 연동**: Route53 Alias 레코드로 ALB와 직접 연결해 성능 최적화해요.
-
-### 9. cert-manager 및 SSL 구성
-
-#### 주요 구성
-
-| 구성 요소         | 설정값                 |
-| ----------------- | ---------------------- |
-| 배포 위치         | EKS 클러스터 내 배포   |
-| 인증서 발급자     | Let's Encrypt (무료)   |
-| 검증 방식         | HTTP-01 Challenge      |
-| 자동 갱신         | 만료 30일 전 자동 갱신 |
-| 와일드카드 인증서 | \*.wonq.store          |
-
-#### 설계 결정 근거
-
-- **Let's Encrypt**: 무료 SSL 인증서로 비용 절약하면서도 보안 확보해요.
-- **cert-manager**: Kubernetes 네이티브 방식으로 인증서 자동 관리해요.
-- **HTTP-01 Challenge**: DNS 설정 없이도 인증서 발급 가능해요.
-
-## 비용 분석
+### 8. 비용 분석
 
 **10일간 운영 비용**을 분석해보면 다음과 같아요 (ap-northeast-2 서울 리전 기준)
 
