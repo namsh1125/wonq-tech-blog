@@ -115,7 +115,7 @@ graph TB
         I1 --> R1[service-ingress]
         I1 --> R2[argocd-ingress]
         I1 --> R3[linkerd-ingress]
-        I1 --> R4[prometheus-grafana-ingress]
+        I1 --> R4[grafana-ingress]
 
         R1 --> D1["www․wonq․store"]
         R1 --> D2["merchant․wonq․store"]
@@ -394,7 +394,7 @@ graph TB
         I1 --> R1[service-ingress]
         I2 --> R2[argocd-ingress]
         I2 --> R3[linkerd-ingress]
-        I2 --> R4[prometheus-grafana-ingress]
+        I2 --> R4[grafana-ingress]
 
         R1 --> D1["www․wonq․store"]
         R1 --> D2["merchant․wonq․store"]
