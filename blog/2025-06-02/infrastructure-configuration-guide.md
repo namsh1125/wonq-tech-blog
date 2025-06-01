@@ -78,16 +78,15 @@ tags: []
 
 #### 주요 구성
 
-| 구성 요소         | 설정값                                                          |
-| ----------------- | --------------------------------------------------------------- |
-| VPC CIDR          | 10.0.0.0/16                                                     |
-| 퍼블릭 서브넷     | 3개 (각 AZ별): 10.0.1.0/24, 10.0.2.0/24, 10.0.3.0/24            |
-| 프라이빗 서브넷   | 3개 (각 AZ별): 10.0.10.0/24, 10.0.11.0/24, 10.0.12.0/24         |
-| 인터넷 게이트웨이 | 1개                                                             |
-| NAT 게이트웨이    | 3개 (각 AZ별)                                                   |
-| 가용 영역         | 3개 AZ 사용 (ap-northeast-2a, ap-northeast-2b, ap-northeast-2c) |
-| 배치 전략         | 각 AZ별 독립 배치로 고가용성 확보                               |
-| 라우팅            | 크로스 AZ 라우팅으로 장애 시 백업 경로 제공                     |
+| 구성 요소             | 세부 항목       | 설정값                                                     |
+| --------------------- | --------------- | ---------------------------------------------------------- |
+| **VPC**               | CIDR            | 10.0.0.0/16                                                |
+|                       | 가용 영역       | 3개 AZ (ap-northeast-2a, ap-northeast-2b, ap-northeast-2c) |
+| **서브넷**            | 퍼블릭 서브넷   | 3개 (각 AZ별): 10.0.1.0/24, 10.0.2.0/24, 10.0.3.0/24       |
+|                       | 프라이빗 서브넷 | 3개 (각 AZ별): 10.0.10.0/24, 10.0.11.0/24, 10.0.12.0/24    |
+| **NAT Gateway**       | 개수            | 3개 (각 AZ별 배치)                                         |
+|                       | 배치 전략       | 크로스 AZ 라우팅으로 장애 시 백업 경로 제공                |
+| **인터넷 게이트웨이** | 개수            | 1개                                                        |
 
 #### 설계 결정 근거
 
@@ -227,99 +226,20 @@ AWS는 RDS 고가용성을 위해 다음과 같은 템플릿을 제공하지만,
 
 ### 5. IAM 구성 (최소 권한 원칙)
 
-**주요 정책 구성**
+#### 주요 구성
 
-**개발자 그룹 (Developer Group)**
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "eks:DescribeCluster",
-        "eks:ListClusters",
-        "eks:DescribeNodegroup",
-        "eks:ListNodegroups"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:DeleteObject",
-        "s3:ListBucket"
-      ],
-      "Resource": ["arn:aws:s3:::wonq-images/*", "arn:aws:s3:::wonq-images"]
-    }
-  ]
-}
-```
-
-**EKS 서비스 계정 (Service Account)**
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": ["rds:DescribeDBInstances", "rds:DescribeDBClusters"],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
-      "Resource": "arn:aws:s3:::wonq-images/*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "route53:ChangeResourceRecordSets",
-        "route53:GetChange",
-        "route53:ListResourceRecordSets"
-      ],
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "route53:ChangeAction": ["UPSERT", "DELETE"]
-        }
-      }
-    }
-  ]
-}
-```
-
-**모니터링 서비스 계정**
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "cloudwatch:GetMetricStatistics",
-        "cloudwatch:ListMetrics",
-        "ec2:DescribeInstances",
-        "eks:DescribeCluster",
-        "rds:DescribeDBInstances"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-```
+| 역할/그룹           | 서비스 | 허용 권한                          | 리소스 범위      | 용도                           |
+| ------------------- | ------ | ---------------------------------- | ---------------- | ------------------------------ |
+| **개발자 그룹**     | 전체   | 모든 읽기 권한 (Describe, List)    | 모든 AWS 리소스  | 인프라 상태 모니터링 및 디버깅 |
+|                     | S3     | 모든 S3 권한 (Full Access)         | 모든 S3 리소스   | S3 버킷 및 객체 전체 관리      |
+| **EKS 서비스 계정** | S3     | GetObject, PutObject, DeleteObject | wonq-images 버킷 | 애플리케이션 이미지 처리       |
 
 **설계 결정 근거:**
 
 - **최소 권한 원칙**: 각 역할별로 꼭 필요한 권한만 부여해요.
-- **서비스 계정 분리**: EKS 내부 서비스들은 Kubernetes Service Account와 IAM Role을 연결해서 세밀한 권한 제어를 해요.
-- **리소스 제한**: S3는 특정 버킷만, Route53은 특정 액션만 허용해요.
-- **모니터링 권한**: Prometheus와 Grafana가 AWS 리소스 메트릭을 수집할 수 있도록 읽기 전용 권한을 부여해요.
+- **개발자 그룹 읽기 권한**: 개발자들이 인프라 전체 상태를 파악할 수 있도록 모든 AWS 서비스에 대한 읽기 권한을 부여했어요. 디버깅이나 문제 해결 시 EKS, RDS, VPC 등 모든 리소스 상태를 확인할 수 있어 효율적인 개발이 가능해요.
+- **개발자 그룹 S3 전체 권한**: 개발 과정에서 S3 버킷 생성, 삭제, 정책 변경 등이 필요할 수 있어 S3에 대한 전체 권한을 부여했어요. 이미지 업로드 테스트, 백업 버킷 관리, 정적 웹사이트 호스팅 설정 등 다양한 개발 작업이 가능해요.
+- **서비스 계정 최소 권한**: EKS 내부 서비스들은 애플리케이션 운영에 꼭 필요한 S3 이미지 처리 권한만 부여해서 보안을 강화했어요.
 
 ### 6. ALB (Application Load Balancer) 구성
 
@@ -372,14 +292,6 @@ AWS는 RDS 고가용성을 위해 다음과 같은 템플릿을 제공하지만,
 | **총합**              |                    |             | **$171.74**     | **₩236,862.462** |
 
 _6월 2일 오전 12:09분 기준, 환율: 1달러 = 1,380.44원_
-
-**주요 가격 차이점 (서울 리전 vs 버지니아 리전):**
-
-- **EC2**: t3.medium이 서울에서 약 11% 더 비싸요 ($0.1248 → $0.1384)
-- **RDS**: db.t3.small이 서울에서 약 22% 더 비싸요 ($0.034 → $0.0416)
-- **NAT Gateway**: 데이터 처리 비용이 서울에서 약 67% 더 저렴해요 ($0.059 vs $0.177, 1GB당)
-- **Route53 헬스 체크**: 서울에서 50% 더 비싸요 ($0.50 → $0.75/월)
-- **EBS**: gp3 스토리지가 서울에서 20% 더 비싸요 ($0.08 → $0.096/GB/월)
 
 ## 참고 자료
 
