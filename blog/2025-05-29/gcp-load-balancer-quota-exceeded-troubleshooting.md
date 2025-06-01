@@ -113,7 +113,9 @@ graph TB
         L1 --> I1[NGINX Ingress Controller]
 
         I1 --> R1[service-ingress]
-        I1 --> R2[monitoring-ingress]
+        I1 --> R2[argocd-ingress]
+        I1 --> R3[linkerd-ingress]
+        I1 --> R4[prometheus-grafana-ingress]
 
         R1 --> D1["www․wonq․store"]
         R1 --> D2["merchant․wonq․store"]
@@ -125,8 +127,8 @@ graph TB
         R1 --> D8["bank․wonq․store"]
 
         R2 --> D9["argocd․wonq․store"]
-        R2 --> D10["linkerd․wonq․store"]
-        R2 --> D11["grafana․wonq․store"]
+        R3 --> D10["linkerd․wonq․store"]
+        R4 --> D11["grafana․wonq․store"]
 
         D1 --> S1[wonq-order-user-client]
         D2 --> S2[wonq-order-merchant-client]
@@ -153,7 +155,7 @@ graph TB
     class A1,A2 clientStyle
     class L1 lbStyle
     class I1 ingressStyle
-    class R1,R2 resourceStyle
+    class R1,R2,R3,R4 resourceStyle
     class D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11 domainStyle
     class S1,S2,S3,S4,S5,S6,S7,S8 serviceStyle
     class M1,M2,M3 serviceStyle
@@ -390,7 +392,9 @@ graph TB
         L2 --> I2[Monitoring Ingress Controller]
         
         I1 --> R1[service-ingress]
-        I2 --> R2[monitoring-ingress]
+        I2 --> R2[argocd-ingress]
+        I2 --> R3[linkerd-ingress]
+        I2 --> R4[prometheus-grafana-ingress]
 
         R1 --> D1["www․wonq․store"]
         R1 --> D2["merchant․wonq․store"]
@@ -402,8 +406,8 @@ graph TB
         R1 --> D8["bank․wonq․store"]
 
         R2 --> D9["argocd․wonq․store"]
-        R2 --> D10["linkerd․wonq․store"]
-        R2 --> D11["grafana․wonq․store"]
+        R3 --> D10["linkerd․wonq․store"]
+        R4 --> D11["grafana․wonq․store"]
 
         D1 --> S1[wonq-order-user-client]
         D2 --> S2[wonq-order-merchant-client]
@@ -432,7 +436,7 @@ graph TB
     class L1 lbStyle
     class L2 securityLbStyle
     class I1,I2 ingressStyle
-    class R1,R2 resourceStyle
+    class R1,R2,R3,R4 resourceStyle
     class D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11 domainStyle
     class S1,S2,S3,S4,S5,S6,S7,S8 serviceStyle
     class M1,M2,M3 serviceStyle
