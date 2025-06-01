@@ -14,13 +14,13 @@ tags: []
 
 ## 인프라 구성 요구사항
 
-저희 원큐 오더 프로젝트는 금융 서비스 특성상 다음과 같은 요구사항이 있었어요:
+저희 원큐 오더 프로젝트는 금융 서비스 특성상 다음과 같은 요구사항이 있었어요.
 
 - **보안성**: 금융 데이터 처리를 위한 강화된 보안 정책
 - **가용성**: 서비스 중단 최소화를 위한 고가용성 설계
 - **확장성**: 트래픽 증가에 대응할 수 있는 확장 가능한 아키텍처
 
-하지만 현실적인 제약사항도 고려해야 했어요:
+하지만 현실적인 제약사항도 고려해야 했어요.
 
 - **예산 제한**: 총 25만원 크레딧으로 프로젝트 기간(4월 18일부터 6월 11일) 동안 운영
 - **팀 규모**: 1명이 인프라를 관리
@@ -29,7 +29,7 @@ tags: []
 
 <!-- ![AWS 인프라 아키텍처](./img/wonq-order-aws-architecture.png) -->
 
-최종적으로 결정한 인프라 아키텍처는 다음과 같아요:
+최종적으로 결정한 인프라 아키텍처는 다음과 같아요.
 
 ### 네트워크 계층
 
@@ -76,14 +76,14 @@ tags: []
 
 ### 1. VPC 및 네트워크 구성
 
-**주요 구성:**
+**주요 구성**
 
 - VPC CIDR: 10.0.0.0/16
 - 퍼블릭 서브넷 3개 (각 AZ별): 10.0.1.0/24, 10.0.2.0/24, 10.0.3.0/24
 - 프라이빗 서브넷 3개 (각 AZ별): 10.0.10.0/24, 10.0.11.0/24, 10.0.12.0/24
 - 인터넷 게이트웨이 1개, NAT 게이트웨이 3개 (각 AZ별)
 
-**설계 결정 근거:**
+**설계 결정 근거**
 
 - **단일 VPC**: [이전 포스팅](../2025-05-23/infrastructure-stack-selection.md)에서 언급했듯이, Kubernetes 네임스페이스를 통한 논리적 격리로 충분하다고 판단했어요.
 - **3개 AZ 사용**: [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_fault_isolation_multiaz_region_system.html)에서 권장하는 고가용성 구성이에요. (최소 2개 AZ 이상)
@@ -91,13 +91,13 @@ tags: []
 
 ### 2. NAT Gateway 구성
 
-**주요 구성:**
+**주요 구성**
 
 - 3개 NAT Gateway (각 AZ의 퍼블릭 서브넷에 배치)
 - Elastic IP 3개 (각 NAT Gateway당 1개)
 - 대역폭: 최대 100Gbps (AWS 공식 스펙)
 
-**NAT Gateway vs NAT Instance 상세 비교분석:**
+**NAT Gateway vs NAT Instance 상세 비교분석**
 
 [AWS 공식 문서](https://docs.aws.amazon.com/ko_kr/vpc/latest/userguide/vpc-nat-comparison.html)에 따른 NAT Gateway와 NAT Instance의 핵심 차이점은 다음과 같아요:
 
@@ -117,29 +117,29 @@ tags: []
 
 **설계 결정 근거:**
 
-- **NAT Gateway 선택 이유**:
+- **NAT Gateway 선택 이유**
   - **성능 안정성**: NAT Gateway는 최대 100Gbps까지 자동 확장되어 트래픽 급증에도 안정적으로 대응할 수 있어요. NAT Instance는 인스턴스 타입에 따라 성능이 제한되고, 트래픽 증가 시 수동으로 스케일업해야 해요.
   - **금융 서비스 안정성**: [Amazon VPC NAT Gateway SLA](https://d1.awsstatic.com/legal/vpc-sla/Amazon%20VPC%20NAT%20Gateway%20SLA_Korean_2022-05-05.pdf)에 따라 99.9% SLA가 보장되어 서비스 중단 위험을 최소화할 수 있어요.
 - **3개 NAT Gateway (고가용성 구성)**: 각 AZ별로 NAT Gateway를 배치하여 최대한의 고가용성을 확보했어요. 한 AZ의 NAT Gateway에 장애가 발생해도 다른 AZ의 프라이빗 서브넷들이 정상 동작하는 NAT Gateway를 통해 계속 인터넷에 접근할 수 있도록 크로스 AZ 라우팅을 구성했어요. 비용이 증가하지만, 금융 서비스의 높은 가용성 요구사항을 충족하기 위해 선택했어요.
 
 ### 3. EKS 클러스터 구성
 
-**주요 구성:**
+**주요 구성**
 
 - Kubernetes 버전: 1.32 (AWS EKS 기본값)
 - 노드 그룹: t3.medium 인스턴스 (3~4개 노드)
 - 클러스터 로깅: API, Audit, Authenticator, Controller Manager, Scheduler
 - 엔드포인트: 퍼블릭/프라이빗 모두 활성화
 
-**설계 결정 근거:**
+**설계 결정 근거**
 
-- **Kubernetes 버전 1.32**: AWS EKS 클러스터 생성 시 기본값인 1.32를 선택했어요:
+- **Kubernetes v1.32**: AWS EKS 클러스터 생성 시 기본값인 1.32를 선택했어요.
   - **표준 지원**: 1.32는 2026년 3월 23일까지 표준 지원이 보장되어 있어 추가 비용 없이 안정적으로 사용할 수 있어요.
   - **최신 기능**: 최신 Kubernetes 기능과 보안 패치를 활용할 수 있어요.
   - **AWS 권장**: AWS에서 새 클러스터 생성 시 기본적으로 제공하는 버전으로, AWS가 가장 안정적이라고 판단한 버전이에요.
-  - **Add-on 호환성**: cert-manager, Linkerd, ArgoCD 등 주요 Add-on들이 모두 1.32를 지원해요.
-  - **10일 운영**: 짧은 운영 기간이므로 새로운 기능보다는 AWS 기본 설정을 따르는 것이 안전해요.
-- **클러스터 로깅 활성화**: API, Audit, Authenticator, Controller Manager, Scheduler 로깅을 활성화한 이유는 다음과 같아요:
+  - **Add-on 호환성**: [cert-manager](https://cert-manager.io/docs/releases/), [Linkerd](https://linkerd.io/2-edge/reference/k8s-versions/), [ArgoCD](https://argo-cd.readthedocs.io/en/stable/operator-manual/installation/) 등 주요 Add-on들이 모두 1.32를 지원해요.
+- **t3.medium 인스턴스 3개**: [이전 포스팅](../2025-06-01/aws-eks-instance-spec-decision.md)에서 분석한 GCP 리소스 사용량을 바탕으로 결정했어요.
+- **클러스터 로깅 활성화**: API, Audit, Authenticator, Controller Manager, Scheduler 로깅을 활성화 했어요.
   - **API 로깅**: 모든 kubectl 명령어와 API 호출을 추적해서 보안 감사와 디버깅에 필수적이에요.
   - **Audit 로깅**: 금융 서비스 특성상 모든 작업에 대한 감사 추적이 필요해요. 누가, 언제, 무엇을 했는지 기록해요.
   - **Authenticator 로깅**: 인증 실패나 권한 관련 문제를 추적하기 위해 필요해요.
@@ -147,8 +147,6 @@ tags: []
 - **퍼블릭/프라이빗 엔드포인트 모두 활성화**:
   - **퍼블릭 엔드포인트**: 개발자들이 로컬에서 kubectl로 클러스터에 접근할 수 있어요. 보안 그룹으로 특정 IP만 허용해요.
   - **프라이빗 엔드포인트**: 클러스터 내 노드들이 API 서버와 통신할 때 프라이빗 네트워크를 사용해서 보안과 성능을 향상시켜요.
-- **t3.medium 인스턴스**: [이전 포스팅](../2025-06-01/aws-eks-instance-spec-decision.md)에서 분석한 GCP 리소스 사용량을 바탕으로 결정했어요. 2 vCPU, 4GB RAM으로 시간당 약 $0.0416이며, 비용 효율성과 성능의 균형이 우수해요.
-- **Auto Scaling**: 최소 3개, 최대 4개 노드로 트래픽에 따른 자동 확장이 가능해요. [이전 분석](../2025-06-01/aws-eks-instance-spec-decision.md)에서 3개 노드가 가장 비용 효율적임을 확인했어요.
 
 ### 4. RDS 구성
 
@@ -551,6 +549,8 @@ AWS는 RDS 고가용성을 위해 다음과 같은 템플릿을 제공하지만,
 - [NAT 게이트웨이 및 NAT 인스턴스 비교](https://docs.aws.amazon.com/ko_kr/vpc/latest/userguide/vpc-nat-comparison.html)
 - [AWS Pricing Calculator](https://calculator.aws/)
 - [Kubernetes 공식 문서](https://kubernetes.io/docs/home/)
+- [Send control plane logs to CloudWatch Logs](https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html#control-plane-logs-types)
+- [Control network access to cluster API server endpoint](https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html)
 
 ```
 
