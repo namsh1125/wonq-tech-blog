@@ -317,7 +317,7 @@ AWS EKS로 마이그레이션하기 전에 [AWS EKS Best Practices Guide](https:
 - **필요 리소스**: 956m CPU, 14.3GB 메모리
 - **리소스 충족도**: CPU 여유, Memory 여유
 - **시간당 비용**: $0.00624 × 4 = $0.02496
-- **평가**: 리소스 여유도가 높지만, 비용이 옵션 1보다 33% 증가함. 메모리 여유는 있지만, 3개 노드로도 충분히 고가용성 확보 가능
+- **평가**: 리소스 여유도가 높지만, 비용이 **옵션 1보다 33% 비쌈**. 메모리 여유는 있지만, 3개 노드로도 충분히 고가용성 확보 가능
 
 #### 옵션 3: t3.large × 2개
 
@@ -325,7 +325,7 @@ AWS EKS로 마이그레이션하기 전에 [AWS EKS Best Practices Guide](https:
 - **필요 리소스**: 630m CPU, 10.6GB 메모리
 - **리소스 충족도**: CPU 여유, Memory 여유
 - **시간당 비용**: $0.01248 × 2 = $0.02496
-- **평가**: 리소스 여유도가 높지만, 동일 가격에 비해 옵션 2보다 CPU가 부족하고, 2개 노드로 인한 가용성 위험이 큼.
+- **평가**: 리소스 여유도가 높지만, 동일 가격에 비해 **옵션 2보다 CPU가 부족**하고, 2개 노드로 인한 **가용성이 떨어짐**.
 
 ## 최종 결정: t3.medium × 3개 다중 노드 구성
 
@@ -336,7 +336,7 @@ AWS EKS로 마이그레이션하기 전에 [AWS EKS Best Practices Guide](https:
 2. 메모리 부족분(0.4GB)에 대해서는 **EKS 오토스케일링을 신뢰**하기로 했어요.
    현재 저희가 계산한 리소스는 **이미 1.2배 여유분이 포함**된 것이고, **EKS Cluster Autoscaler가 부하 증가 시 자동으로 노드를 추가**해줄 거예요.
 
-3. **고가용성** 측면에서도 3개 노드면 충분한 분산 효과와 장애 복원력을 확보할 수 있어요.
+3. **고가용성** 측면에서도 3개 노드면 충분한 **분산 효과와 장애 복원력을 확보**할 수 있어요.
    1개 노드에 장애가 발생해도 나머지 2개 노드로 서비스를 지속할 수 있고, 과도한 노드 수보다는 실용적인 구성이라고 생각해요.
 
 ## 마무리
@@ -355,4 +355,4 @@ AWS EKS 마이그레이션이나 인스턴스 스펙 결정과 관련해 궁금�
 - [Amazon EKS User Guide](https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html)
 - [EC2 Instance Types](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html)
 - [AWS EKS Best Practices Guide](https://docs.aws.amazon.com/eks/latest/best-practices/introduction.html)
-- [AWS EKS Pricing](https://aws.amazon.com/eks/pricing/)_
+- [AWS EKS Pricing](https://aws.amazon.com/eks/pricing/)
